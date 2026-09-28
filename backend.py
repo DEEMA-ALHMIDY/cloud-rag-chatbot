@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from openai import OpenAI
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
 
 import json
 import os
@@ -27,6 +29,30 @@ from azure.storage.blob import BlobClient
 
 
 load_dotenv()
+KEY_VAULT_NAME = os.getenv("KEY_VAULT_NAME")
+
+if KEY_VAULT_NAME:
+    credential = DefaultAzureCredential()
+    secret_client = SecretClient(
+        vault_url=f"https://{KEY_VAULT_NAME}.vault.azure.net/",
+        credential=credential,
+    )
+
+    secret_map = {
+        "PROJ-DB-NAME": "DB_NAME",
+        "PROJ-DB-USER": "DB_USER",
+        "PROJ-DB-PASSWORD": "DB_PASSWORD",
+        "PROJ-DB-HOST": "DB_HOST",
+        "PROJ-DB-PORT": "DB_PORT",
+        "PROJ-OPENAI-API-KEY": "OPENROUTER_API_KEY",
+        "PROJ-AZURE-STORAGE-SAS-URL": "AZURE_STORAGE_SAS_URL",
+        "PROJ-AZURE-STORAGE-CONTAINER": "AZURE_STORAGE_CONTAINER",
+        "PROJ-CHROMADB-HOST": "CHROMADB_HOST",
+        "PROJ-CHROMADB-PORT": "CHROMADB_PORT",
+    }
+
+    for secret_name, env_name in secret_map.items():
+        os.environ[env_name] = secret_client.get_secret(secret_name).value
 
 
 # -----------------------------
@@ -50,7 +76,7 @@ CHAT_MODEL = "openrouter/free"
 EMBEDDING_MODEL = "nvidia/nemotron-3-embed-1b:free"
 
 if not OPENROUTER_API_KEY:
-    raise RuntimeError("OPENROUTER_API_KEY is missing from .env")
+    raise RuntimeError("OPENROUTER_API_KEY is missing")
 
 
 # -----------------------------

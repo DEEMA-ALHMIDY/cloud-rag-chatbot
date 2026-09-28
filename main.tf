@@ -92,18 +92,16 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = azurerm_public_ip.pip.id
   }
 }
-
-resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
-  network_interface_id      = azurerm_network_interface.nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "chatbot-vm"
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   size                = "Standard_D2ads_v6"
   admin_username      = "azureuser"
+
+  identity {
+    type = "SystemAssigned"
+  }
 
   network_interface_ids = [
     azurerm_network_interface.nic.id
@@ -126,4 +124,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
     sku       = "server"
     version   = "latest"
   }
+}
+resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
+  network_interface_id      = azurerm_network_interface.nic.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }

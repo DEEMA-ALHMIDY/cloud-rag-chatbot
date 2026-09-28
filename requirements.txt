@@ -16,3 +16,5 @@ langchain-text-splitters
 langchain-classic
 azure-core
 azure-storage-blob
+azure-identity
+azure-keyvault-secrets
