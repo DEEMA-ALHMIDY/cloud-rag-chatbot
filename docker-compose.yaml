@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-myuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mysecretpassword}
+      POSTGRES_DB: ${DB_NAME:-mydatabase}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  chromadb:
+    image: chromadb/chroma
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - chromadb
+    volumes:
+      - ./chat_logs:/app/chat_logs
+      - ./pdf_store:/app/pdf_store
+
+  chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile.chatbot
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:5000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  chromadb_data:

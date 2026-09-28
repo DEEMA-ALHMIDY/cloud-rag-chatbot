@@ -1,0 +1,15 @@
+.env
+terraform.tfvars
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+ssh-keys/
+*.pem
+__pycache__/
+*.pyc
+.venv/
+chat_logs/
+chroma_data/
+pdf_files/
+pdf_store/
