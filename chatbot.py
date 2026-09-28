@@ -1,7 +1,7 @@
 import streamlit as st
 import uuid
-import requests
 import os
+import requests
 
 # Backend URLs define
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:5000").rstrip("/")

@@ -7,3 +7,8 @@ variable "subscription_id" {
   description = "Azure Subscription ID"
   type        = string
 }
+variable "db_admin_password" {
+  description = "PostgreSQL administrator password"
+  type        = string
+  sensitive   = true
+}

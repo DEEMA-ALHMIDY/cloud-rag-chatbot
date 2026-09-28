@@ -13,3 +13,5 @@ chat_logs/
 chroma_data/
 pdf_files/
 pdf_store/
+app.py
+frontend.py
